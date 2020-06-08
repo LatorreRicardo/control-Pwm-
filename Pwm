@@ -1,0 +1,60 @@
+#include <18f4550.h>
+#device ADC=10
+#fuses  NOWDT, NOPROTECT,NOLVP,XT, PUT,BROWNOUT,INTRC_IO 
+#use delay(clock=4000000) 
+#define LCD_ENABLE_PIN  PIN_B1                                    
+#define LCD_RS_PIN      PIN_B2                                    
+#define LCD_RW_PIN      PIN_B3                                    
+#define LCD_DATA4       PIN_B4                                    
+#define LCD_DATA5       PIN_B5                                    
+#define LCD_DATA6       PIN_B6                                    
+#define LCD_DATA7       PIN_B7                                    
+#include <LCD.c>
+int16 duty=0;
+int Timer2,Poscaler;
+void main()
+{
+   int16 lectura;
+   float bit;
+   setup_adc_ports(AN0);
+   setup_adc(adc_clock_internal);
+   lcd_init();
+   while(true)
+   {
+      set_adc_channel(0);
+      delay_us(20);
+      lectura=read_adc();
+      bit=((5.0*lectura)/1024);     //División según los bits elegidos 8 o 10bits(256 o 1024)
+      lcd_gotoxy(1,1);
+      printf(lcd_putc,"El ADC: %4Lu",lectura);
+      printf(lcd_putc,"\nEl V(t): %1.2f",bit);
+      if(lectura==0 && lectura<=400)
+      {
+     output_high(pin_a1);
+     output_low(pin_a2);
+     output_low(pin_a3);
+       }
+     if(lectura>=401 && lectura<=700)
+   {
+       output_low(pin_a1);
+       output_high(pin_a2);
+       output_low(pin_a3);
+   }
+     if(lectura>=701 && lectura<=1023)
+      {
+       output_low(pin_a1);
+       output_low(pin_a2);
+       output_high(pin_a3);
+      }
+   Timer2=249;    
+   Poscaler=1
+   setup_timer_2(t2_div_by_4,Timer2,Poscaler);   
+   setup_ccp1(ccp_pwm);                
+   setup_adc_ports(all_analog);        
+   setup_adc(adc_clock_internal);
+        set_adc_channel(0);   
+        delay_us(100);       
+        duty=read_adc(); 
+        set_pwm1_duty(duty);
+   }
+   }
