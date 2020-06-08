@@ -1,0 +1,58 @@
+int sensor =A0;
+int bajo =7;
+int medio =8;
+int alto =12;
+int sensorValue= 0; // Iniciar variable con un 0 
+void setup() 
+{
+
+  pinMode(bajo,OUTPUT);
+  pinMode(medio,OUTPUT);
+  pinMode(alto,OUTPUT);
+  digitalWrite(bajo,LOW);
+  digitalWrite(medio,LOW);
+  digitalWrite(alto,LOW);
+  Serial.begin(9600);
+}
+void loop()   
+{
+  sensorValue = analogRead(sensor); // lee la entrada del pin A0      
+  Serial.println(sensorValue, DEC); // Imprimir el valor decimal
+  Serial.println(" ppm");
+  delay(250); 
+  //HH ---
+  if(sensor<=45)
+  {
+  Serial.println("No se detecta muchas particulas de HHO");
+  digitalWrite(bajo,LOW);
+  digitalWrite(medio,LOW);
+  digitalWrite(alto,LOW);
+  delay(100);
+  }
+// estado bajo de hidrogeno
+  if(sensorValue>=46 && sensorValue<=65)
+  {
+  Serial.println("Bajo nivel de Hidrogeno");
+  digitalWrite(bajo,HIGH);
+  digitalWrite(medio,LOW);
+  digitalWrite(alto,LOW);
+  delay(100);
+  }
+// MEDIO
+  if(sensorValue>=74 && sensorValue<=399)
+  {
+  Serial.println(" Nivel medio de Hidrogeno");
+  digitalWrite(bajo,LOW);
+  digitalWrite(medio,HIGH);
+  digitalWrite(alto,LOW);
+  delay(100);
+  }
+// ALTO
+  if(sensorValue>=400)
+  {
+  Serial.println("Alto nivel de Hidrogeno");
+  digitalWrite(bajo,LOW);
+  digitalWrite(medio,LOW);
+  digitalWrite(alto,HIGH);
+  delay(100);}
+}
